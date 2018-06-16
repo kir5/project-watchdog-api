@@ -18,8 +18,6 @@ router.use(cookieSession({
  router.use(passport.initialize());
  router.use(passport.session());
 
-
-
 // To encode user into a cookie
 passport.serializeUser((user, done)=> {
     done(null, user.id);
@@ -33,21 +31,17 @@ passport.deserializeUser((id, done)=> {
     });
 });
 
-
 // Using google passport strategy
 passport.use(new GoogleStrategy({
     clientID: keys.googleClientID,
     clientSecret: keys.googleClientSecret,
-    callbackURL: '/auth/google/callback'
+    callbackURL: '/api/auth/google/callback'
 }, (accessToken,refreshToken,profile,done) => {  // this is returned after google code to google profile exchange with google
-    //console.log(accessToken); // access granted for me from google servers
-    //console.log(refreshToken);
-    //console.log(profile);
-
     userModel.findOne({googleID: profile.id})
     .then(user => {
         if(user)
         {
+            //console.log("user found");
             done(null, user);
         }
         else
@@ -79,7 +73,10 @@ scope: ['profile','email']
 
 
 router.get('/google/callback',
-    passport.authenticate('google') // perform code-profile exchange
+    passport.authenticate('google'), // perform code-profile exchange
+    (req, res) =>{
+        res.redirect('http://localhost:4500/api/auth/login');
+    }
 ); 
 
 
@@ -113,12 +110,9 @@ passport.use(new LocalStrategy({
 // Login route  auth/login
 router.get("/login", (req, res) => {
     res.send({ message: "success" });
-    //  res.send(res.user);
-    // res.redirect("http://localhost:3000/home")
 });
 router.get("/login/fail", (req, res) => {
     res.send({ message: "fail" });
-    //   res.send(res.user);
 });
 
 // Login route

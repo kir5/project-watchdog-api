@@ -12,6 +12,7 @@ const projects = require('./routes/projects');
 const milestones = require('./routes/milestones');
 const tasks = require('./routes/tasks');
 const requests = require('./routes/requests');
+const history = require('./routes/history');
 const chats = require('./routes/chats');
 const cors = require('cors');
 const cookieSession = require('cookie-session');
@@ -55,6 +56,9 @@ app.use('/api/tasks', tasks);
 
 // /api/requests route to routes/requests.js
 app.use('/api/requests', requests);
+
+// /api/history route to routes/history.js
+app.use('/api/history', history);
 
 // /api/chats route to routes/chats.js
 app.use('/api/chats', chats);

@@ -3,8 +3,9 @@ module.exports = {
     {
         if(req.isAuthenticated())
         {
-            return next();
+            return next();            
         }
-        res.redirect('http://localhost:3000/home');
+        res.redirect('https://projectwatchdog.herokuapp.com/home');
     }
 }
+

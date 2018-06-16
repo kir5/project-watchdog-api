@@ -39,6 +39,8 @@ router.get("/single/:id/:milestoneId", (req, res) => {
 // Insert MileStone by Updating Project
 // put '/api/milestones/:id/:userId' id is the projectID userId is the userID
 router.put("/:id/:userId", (req, res) => {
+  var mTitle = req.body.MileStoneTitle;
+  var mDeadline = req.body.DeadLine;
   var query = projectModel
     .update(
       { _id: req.params.id },
@@ -63,53 +65,12 @@ router.put("/:id/:userId", (req, res) => {
               $push: {
                 History: {
                   UserName: User.Fname + " " + User.Lname,
-                  Event: "Milestone Added"
+                  Event: mTitle + " added to be delivered for " + new Date(mDeadline).toDateString().substr(0,10),
+                  Type: "Milestone"
                 }
               }
-            }
-          );
-
-          query.exec(function(err, docs) {
-            if (err) {
-              res.send(err);
-            } else {
-              //res.json(docs);
-            }
-          });
-        })
-        .catch(error => {
-          res.send(error);
-        });
-    })
-    .catch(error => {
-      res.send(error);
-    });
-
-  var query = projectModel.findOne({ _id: req.params.id }, { MileStone: 1 });
-  query.exec(function(err, docs) {
-    if (err) {
-      res.send(err);
-    } else {
-      res.json(docs);
-    }
-  });
-});
-
-// Update a single milestone  put '/api/milestones/single/:id/:milestoneID'
-router.put("/single/:id/:milestoneID", (req, res) => {
-  var query = projectModel
-    .update(
-      { _id: req.params.id, "MileStone._id": req.params.milestoneID },
-      {
-        $set: {
-          "MileStone.$.MileStoneTitle": req.body.MileStoneTitle,
-          "MileStone.$.MileStoneDescription": req.body.MileStoneDescription,
-          "MileStone.$.DeadLine": req.body.DeadLine,
-          "MileStone.$.Status": req.body.Status
-        }
-      }
-    )
-    .then(Projects => {
+            })
+        .then(() =>{
       var query = projectModel.findOne(
         { _id: req.params.id },
         { MileStone: 1 }
@@ -122,14 +83,84 @@ router.put("/single/:id/:milestoneID", (req, res) => {
         }
       });
     })
+  })
+})
+    .catch(error => {
+      res.send(error);
+    });
+});
+
+// Update a single milestone  put '/api/milestones/single/:id/:milestoneID/:userId'
+router.put("/single/:id/:milestoneID/:userId", (req, res) => {
+  var query = projectModel
+.update(
+  { _id: req.params.id, "MileStone._id": req.params.milestoneID },
+  {
+    $set: {
+      "MileStone.$.MileStoneTitle": req.body.MileStoneTitle,
+      "MileStone.$.MileStoneDescription": req.body.MileStoneDescription,
+      "MileStone.$.DeadLine": req.body.DeadLine,
+      "MileStone.$.Status": req.body.Status
+    }
+  }
+)
+    .then(() => {
+
+      if(req.body.Status == 3)
+      {
+        var query = userModel
+        .findOne({ _id: req.params.userId })
+        .then(User => {
+          var query = projectModel.update(
+            { _id: req.params.id },
+            {
+              $push: {
+                History: {
+                  UserName: User.Fname + " " + User.Lname,
+                  Event: req.body.MileStoneTitle + " was Completed",
+                  Type: "Milestone"
+                }
+              }
+            })
+            .then(User => {
+              var query = projectModel.findOne(
+                { _id: req.params.id },
+                { MileStone: 1 }
+              );
+              query.exec(function(err, docs) {
+                if (err) {
+                  res.send(err);
+                } else {
+                  res.json(docs);
+                }
+              });
+              })
+            })
+      }
+      else
+      {
+        var query = projectModel.findOne(
+          { _id: req.params.id },
+          { MileStone: 1 }
+        );
+        query.exec(function(err, docs) {
+          if (err) {
+            res.send(err);
+          } else {
+            res.json(docs);
+          }
+        });
+      }
+    })
     .catch(error => {
       res.send(error);
     });
 });
 
 // Delete MileStone in a Project by updating Project
-// put 'api/milestones/delete/:id/:milestoneId' id is the projectID , milestoneId is milestoneID
-router.put("/delete/:id/:milestoneId", (req, res) => {
+// put 'api/milestones/delete/:id/:milestoneId/:userId' id is the projectID , milestoneId is milestoneID
+router.put("/delete/:id/:milestoneId/:userId", (req, res) => {
+  var mTitle = req.body.MileStoneTitle;
   var query = projectModel
     .update(
       { _id: req.params.id, "MileStone._id": req.params.milestoneId },
@@ -142,18 +173,35 @@ router.put("/delete/:id/:milestoneId", (req, res) => {
       },
       { multi: true }
     )
-    .then(Projects => {
-      var query = projectModel.findOne(
-        { _id: req.params.id },
-        { MileStone: 1 }
-      );
-      query.exec(function(err, docs) {
-        if (err) {
-          res.send(err);
-        } else {
-          res.json(docs);
-        }
-      });
+    .then(() => {
+          var query = userModel
+            .findOne({ _id: req.params.userId })
+            .then(User => {
+              var query = projectModel.update(
+                { _id: req.params.id },
+                {
+                  $push: {
+                    History: {
+                      UserName: User.Fname + " " + User.Lname,
+                      Event: mTitle + " was Deleted ",
+                      Type: "Milestone"
+                    }
+                  }
+                })
+            .then(() =>{
+          var query = projectModel.findOne(
+            { _id: req.params.id },
+            { MileStone: 1 }
+          );
+          query.exec(function(err, docs) {
+            if (err) {
+              res.send(err);
+            } else {
+              res.json(docs);
+            }
+          });
+        })
+      })
     })
     .catch(error => {
       res.send(error);

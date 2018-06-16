@@ -31,6 +31,10 @@ const UserSchema = new Schema({
         required: true,
         default: 3  // 1:SystemAdmin   2:Advisor    3:Student 
     },
+    Status:{
+        type: Number,
+        default: 1  // 0: blocked   1: active
+    },
     DateOfRegistration:{
         type: Date,
         default: Date.now
@@ -48,7 +52,11 @@ const MilestoneSchema = new Schema({
         required: true
     },
     FileLocation:[String],
-    Status: Number  // 1: 
+    Status: {
+        type: Number,
+        required: true,
+        default: 1      // 1:Incomplete   2:Review    3:Completed 
+    } 
 });
 
 const TaskSchema = new Schema({
@@ -100,6 +108,7 @@ const HistorySchema = new Schema({
     UserName: String,
     Event: String,
     Progress: Number,
+    Type: String,
     Date:{
         type: Date,
         default: Date.now
@@ -126,6 +135,10 @@ const ProjectSchema = new Schema({
     Progress:{
         type: Number,
         default: 0
+    },
+    Status:{
+        type: Number,
+        default: 1  // 0: blocked   1: active
     },
     Member: [{type: Schema.Types.ObjectId, required: true, ref: 'User'}],
     Leader:{
