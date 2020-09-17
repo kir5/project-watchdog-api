@@ -17,6 +17,7 @@ const chats = require('./routes/chats');
 const cors = require('cors');
 const cookieSession = require('cookie-session');
 const keys = require('./config/keys');
+const ServerIP = require('./routes/ServerIP');
 
 app.use(cors());
 

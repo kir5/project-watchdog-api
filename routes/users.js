@@ -34,7 +34,7 @@ router.get('/name/:id',(req,res) => {
 });
 
 
-// Fetching all users from mongodb get '/users'
+// Fetching all users from mongodb get '/api/users'
 router.get('/',(req,res) => {
     
     var query = userModel.find({});
@@ -71,6 +71,23 @@ router.put('/:id',(req,res)=>{
                  Department: req.body.Department,
                  OtherDescription: req.body.OtherDescription,
                  Type: req.body.Type
+             } 
+     });
+
+     query.exec(function(err, doc) {
+         if (err) {
+             res.send(err);
+         } else {
+             res.json(doc);
+         }
+     });
+ });
+ // Block a User by ID put '/api/users/block/:id'
+router.put('/block/:id',(req,res)=>{
+    var query = userModel.update({_id: req.params.id}, 
+     {
+         $set: { 
+                 Status:req.body.Status
              } 
      });
 

@@ -81,7 +81,26 @@ router.put("/:id", (req, res) => {
       $set: {
         ProjectTitle: req.body.ProjectTitle,
         ProjectDescription: req.body.ProjectDescription,
-        DeadLine: req.body.DeadLine
+        DeadLine: req.body.DeadLine,
+      }
+    }
+  );
+
+  query.exec(function(err, doc) {
+    if (err) {
+      res.send(err);
+    } else {
+      res.json(doc);
+    }
+  });
+});
+// Block or unblock a project by id
+router.put("/block/:id", (req, res) => {
+  var query = projectModel.update(
+    { _id: req.params.id },
+    {
+      $set: {
+        Status:req.body.Status
       }
     }
   );

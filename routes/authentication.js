@@ -8,7 +8,7 @@ const keys = require('../config/keys');
 const bcrypt = require('bcryptjs');
 const LocalStrategy = require('passport-local').Strategy;
 const cookieSession = require('cookie-session');
-
+const ServerIp = require('../routes/ServerIP');
 
 router.use(cookieSession({
     maxAge : 30 * 24 * 60 * 60 * 1000,
@@ -75,7 +75,7 @@ scope: ['profile','email']
 router.get('/google/callback',
     passport.authenticate('google'), // perform code-profile exchange
     (req, res) =>{
-        res.redirect('http://localhost:4500/api/auth/login');
+        res.redirect( 'http://localhost:4500/api/auth/login');
     }
 ); 
 
@@ -118,7 +118,7 @@ router.get("/login/fail", (req, res) => {
 // Login route
 router.post("/login/local", (req, res, next) => {
     passport.authenticate("local", {
-        successRedirect: "http://localhost:4500/api/auth/login",
+        successRedirect:   "http://localhost:4500/api/auth/login",
         failureRedirect: "http://localhost:4500/api/auth/login/fail",
         failureFlash: false
     })(req, res, next);

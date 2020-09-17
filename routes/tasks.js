@@ -51,6 +51,7 @@ router.put("/single/:id/:taskId/:userId", (req, res) => {
           "Task.$.TaskDescription": req.body.TaskDescription,
           "Task.$.DeadLine": req.body.DeadLine,
           "Task.$.Catagory": req.body.Catagory,
+          "Task.$.FileLocation": req.body.FileLocation,
           "Task.$.AssignedTo": mongoose.Types.ObjectId(req.body.AssignedTo)
         }
       }
@@ -121,7 +122,8 @@ router.put("/:id/:userId", (req, res) => {
           TaskTitle: req.body.TaskTitle,
           TaskDescription: req.body.TaskDescription,
           DeadLine: req.body.DeadLine,
-          AssignedTo: req.body.AssignedTo
+          AssignedTo: req.body.AssignedTo,
+          FileLocation: req.body.FileLocation
         }
       }
     })
